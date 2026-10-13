@@ -1,4 +1,4 @@
-## NoteChange 0.2 public preview
+## NoteChange 0.2 beta 2 public preview
 
 A Windows app for turning iCloud notes into clean documents, recipes and book chapters while preserving the wording.
 
@@ -15,3 +15,5 @@ A Windows app for turning iCloud notes into clean documents, recipes and book ch
 Real Apple account sign-in, two-factor/device approval and current live Apple Notes capture still require acceptance testing. This release does not claim verified compatibility with every account or note type. Apple web-page changes can affect the adapter; unsupported attachments and complex tables need checking. The installer is unsigned and Windows may show an unknown-publisher warning. Outlook draft behaviour varies by client; rich clipboard paste is the most portable email route.
 
 No AI rewriting, note uploads to a conversion service or automatic email sending. Apple authentication remains on Apple's HTTPS pages. Projects contain note contents and should be stored somewhere private. Current workspace notes are kept in memory; save a project before closing or updating.
+
+Beta 2 also fixes first-line title splitting when an editor stores the title and body in one paragraph.

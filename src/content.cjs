@@ -46,7 +46,11 @@ function format(model,options={}) {
  if(options.titleMode!=='none'){
   const i=blocks.findIndex(b=>b.type!=='table'&&b.runs.some(r=>r.text?.trim()));
   if(options.titleMode==='custom')title=String(options.customTitle||'');
-  else if(i>=0){title=blocks[i].runs.map(r=>r.text||'').join('');const images=blocks[i].runs.filter(r=>r.image);if(images.length)blocks[i]={type:'paragraph',runs:images};else blocks.splice(i,1);}
+  else if(i>=0){
+   const original=blocks[i];const remainder=[];let afterBreak=false;
+   for(const run of original.runs){if(run.image){remainder.push(run);continue;}const text=run.text||'';if(afterBreak){remainder.push(run);continue;}const newline=text.indexOf('\n');if(newline<0)title+=text;else{title+=text.slice(0,newline);afterBreak=true;if(text.slice(newline+1))remainder.push({...run,text:text.slice(newline+1)});}}
+   if(remainder.length)blocks[i]={...original,type:'paragraph',runs:remainder};else blocks.splice(i,1);
+  }
  }
  const text=[title,...blocks.filter(b=>b.runs).map(b=>b.runs.map(r=>r.text||'').join(''))].join('\n');
  let layout=['document','recipe','chapter'].includes(options.layout)?options.layout:'auto';

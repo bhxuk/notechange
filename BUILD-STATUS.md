@@ -11,7 +11,7 @@
 
 ## Verification
 
-Local conversion/capture/security test results and Windows smoke/build results are recorded after the pipeline completes. Simulated Apple DOM tests do not establish compatibility with live authenticated iCloud.
+23 local conversion/capture/security tests passed. The beta 1 Windows Electron smoke test passed (actual interface, recipe/chapter preview, Word and multi-note PDF). Beta 2 is rebuilt with the first-line title fix and packaged-application self-test. Simulated Apple DOM tests do not establish compatibility with live authenticated iCloud.
 
 ## Remaining acceptance
 
