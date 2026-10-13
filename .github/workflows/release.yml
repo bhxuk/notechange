@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+    paths: ['src/**', 'package*.json', '.github/workflows/release.yml', 'tests/**', 'scripts/**']
     tags: ['v*']
 permissions:
   contents: write

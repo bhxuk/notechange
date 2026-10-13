@@ -1,12 +1,12 @@
 # NoteChange
 
-A Windows helper for converting a selected iCloud note or pasted note into a Word document, text, Markdown, or an email message. Designed for two family members who want large controls and a clear preview. Original wording is never sent to an AI or rewritten.
+A Windows helper for converting a selected iCloud note or pasted note into a Word document, text, Markdown, or an email message. Designed for people who want large controls and a clear preview. Original wording is never sent to an AI or rewritten.
 
 **Status: first implementation, not yet verified against a real Apple account or on Windows. Do not call it production ready until the acceptance checklist below passes.**
 
 [Open the private landing-page preview](https://notechange-family.bhxuk.chatgpt.site)
 
-## For Mum and Dad
+## Getting started
 
 See [the illustrated-by-layout quick guide](docs/USER-GUIDE.md).
 1. Open NoteChange from your desktop.
@@ -38,7 +38,7 @@ The per-user installer creates desktop and Start menu shortcuts and opens the ap
 
 - `ci.yml`: syntax checks and conversion tests on pushes and pull requests.
 - `release.yml`: main-branch pushes and manual dispatch build an installer artifact for review; a version tag matching package.json publishes installer + `latest.yml` + blockmap to GitHub Releases.
-- `pages.yml`: serves `docs/` as the landing page. Enable Settings → Pages → Source → GitHub Actions once. Intended address: https://bhxuk.github.io/notechange/ (not claimed live).
+- `pages.yml`: serves `docs/` as the landing page. Enable Settings → Pages → Source → GitHub Actions once, then set the repository Actions variable `NOTECHANGE_GITHUB_PAGES` to `true`. Intended address: https://bhxuk.github.io/notechange/ (not claimed live).
 - Updates use electron-updater with public GitHub Releases. They download in the installed app; installation requires the visible **Install update** button. The project needs a published release before updates can work. Private repositories require a different distribution arrangement; never embed a GitHub token in the app.
 
 Release after Windows/account acceptance:
@@ -62,11 +62,11 @@ This is a web-page adapter, **not an official Apple Notes API**. Apple DOM, fram
 - Supports headings, body paragraphs, bold, italic, underline, strike-through, links, nested lists, checklist markers and basic tables.
 - PNG/JPEG images captured as data URLs go into the preview and Word; other images show a warning. Merged table cells are simplified with a warning. Arbitrary attachments are not exported.
 - CSS-only visual emphasis may not survive the Apple page adapter; actual HTML bold/italic tags do. Verify representative real notes before release.
-- A standard new-email link contains a plain text body and omits subject. Long notes use **Copy for email** or `.eml`; rich formatted clipboard output includes title and body. A `.eml` uses HTML and an empty Subject plus X-Unsent; whether it opens as an editable draft depends on the email client. Test the family's actual Outlook version.
+- A standard new-email link contains a plain text body and omits subject. Long notes use **Copy for email** or `.eml`; rich formatted clipboard output includes title and body. A `.eml` uses HTML and an empty Subject plus X-Unsent; whether it opens as an editable draft depends on the email client. Test the actual Outlook version.
 - Notes live in memory while open. No analytics, cloud conversion service or AI calls. Apple cookies persist in Electron's app data so sign-in can be remembered. **Sign out of Apple** clears that session. Saving notes and copying to the system clipboard are explicit user actions.
 - Preview HTML is allowlist-sanitized; remote images and active content are removed. Remote pages never receive the app preload or Node access. IPC handlers only accept the two local app pages. Navigation stays on Apple HTTPS origins.
 
-## Acceptance before family release
+## Acceptance before release
 
 - [ ] Windows install, shortcut launch, uninstall and SmartScreen/signing decision.
 - [ ] Apple sign-in, 2FA, device approval, note selection and repeat launch.
@@ -74,7 +74,7 @@ This is a web-page adapter, **not an official Apple Notes API**. Apple DOM, fram
 - [ ] Test long notes, locked notes, unsupported attachments and extraction fallback.
 - [ ] Open generated `.docx` in Word and compare with preview; confirm table and image proportions.
 - [ ] Outlook empty-subject draft, rich paste and `.eml` behaviour.
-- [ ] Keyboard-only navigation, 125–200% Windows scaling, and Mum/Dad usability trial.
+- [ ] Keyboard-only navigation, 125–200% Windows scaling, and first-time user trial.
 - [ ] Published GitHub release → install old version → download update → explicit restart.
 
 ## Verification in this workspace

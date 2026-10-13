@@ -13,6 +13,8 @@ concurrency:
   cancel-in-progress: true
 jobs:
   deploy:
+    # Enable Pages in repository settings, then set this repository variable.
+    if: vars.NOTECHANGE_GITHUB_PAGES == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
