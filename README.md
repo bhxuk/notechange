@@ -6,6 +6,8 @@ A Windows helper for converting a selected iCloud note or pasted note into a Wor
 
 [Open the private landing-page preview](https://notechange-family.bhxuk.chatgpt.site)
 
+[Get the Windows test installer from the successful build](https://github.com/bhxuk/notechange/actions/runs/38483623252) — download the `NoteChange-Windows` artifact.
+
 ## Getting started
 
 See [the illustrated-by-layout quick guide](docs/USER-GUIDE.md).

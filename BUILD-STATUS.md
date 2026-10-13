@@ -25,7 +25,7 @@
 
 - A Linux NSIS installer build failed because Wine is not available; its intermediate Setup .exe is not a finished installer and is not a deliverable.
 - Portable Windows executable built successfully: NoteChange-Portable-0.1.0.exe. It is unsigned and Windows runtime behaviour remains untested.
-- GitHub authenticated access is now available. Source is published to https://github.com/bhxuk/notechange. GitHub conversion CI passed and the Windows installer build is running.
+- GitHub authenticated access is now available. Source is published to https://github.com/bhxuk/notechange. GitHub conversion CI passed. The Windows installer build succeeded, including syntax checks, all 12 tests and artifact upload.
 - Local source is committed to main and package-lock.json is included. This first build needs acceptance testing before everyday use.
 
 ## Landing page
@@ -33,3 +33,7 @@
 Private preview deployed successfully: https://notechange-family.bhxuk.chatgpt.site . The GitHub Pages workflow is also included.
 
 GitHub Pages is opt-in because it is not enabled in repository settings. The private landing page is already deployed.
+
+Windows installer build: https://github.com/bhxuk/notechange/actions/runs/38483623252 .
+
+Live Apple sign-in/capture, actual Windows launch/installation and Outlook acceptance remain unverified. The installer is a test build, not a claim of production readiness.
