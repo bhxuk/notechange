@@ -1,7 +1,7 @@
 {
   "name": "notechange",
-  "version": "0.1.0",
-  "description": "A simple, private Apple Notes to Word and email helper for Windows.",
+  "version": "0.2.0-beta.1",
+  "description": "Turn iCloud notes into beautifully formatted documents, recipes and chapters.",
   "main": "src/main.cjs",
   "author": "bhxuk",
   "private": true,
@@ -10,7 +10,8 @@
     "test": "node --test tests/*.test.cjs",
     "check": "node scripts/check.cjs",
     "dist": "electron-builder --win nsis --publish never",
-    "release": "electron-builder --win nsis --publish always"
+    "release": "electron-builder --win nsis --publish always",
+    "smoke": "electron . --smoke-test --disable-gpu"
   },
   "dependencies": {
     "docx": "^9.5.1",
@@ -31,7 +32,9 @@
     },
     "files": [
       "src/**/*",
-      "package.json"
+      "package.json",
+      "build/icon.png",
+      "LICENSE"
     ],
     "win": {
       "target": [
@@ -42,7 +45,8 @@
           ]
         }
       ],
-      "artifactName": "NoteChange-Setup-${version}.${ext}"
+      "artifactName": "NoteChange-Setup-${version}.${ext}",
+      "icon": "build/icon.ico"
     },
     "nsis": {
       "oneClick": true,
@@ -55,7 +59,14 @@
     "publish": {
       "provider": "github",
       "owner": "bhxuk",
-      "repo": "notechange"
+      "repo": "notechange",
+      "releaseType": "prerelease"
     }
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/bhxuk/notechange",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bhxuk/notechange.git"
   }
 }
