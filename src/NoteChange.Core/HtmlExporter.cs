@@ -151,6 +151,7 @@ public static class HtmlExporter
         sb.Append(".label{max-width:794px;margin:0 auto 14px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7d828d}");
         sb.Append(".page{max-width:794px;box-sizing:border-box;margin:0 auto 28px;padding:72px 76px 80px;border-radius:6px;box-shadow:0 18px 50px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.04)}");
         sb.Append("@media (max-width:700px){.page{padding:40px 32px}}");
+        sb.Append("::-webkit-scrollbar{width:12px}::-webkit-scrollbar-track{background:#0b0d11}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:6px;border:3px solid #0b0d11}::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.28)}");
         sb.Append(PaperCss);
         sb.Append("</style></head><body>");
         if (!string.IsNullOrEmpty(heading)) sb.Append("<div class=\"label\">").Append(Escape(heading)).Append("</div>");

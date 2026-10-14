@@ -662,7 +662,7 @@ namespace NoteChange
             UpdateButtons();
             var sources = Sources();
             string key = string.Join("|", sources.Select(s => s.GetHashCode()));
-            _rendered = new TaskCompletionSource<bool>();
+            if (_rendered.Task.IsCompleted) _rendered = new TaskCompletionSource<bool>();
 
             try { _scroll = key == _shownKey && _preview.CoreWebView2 != null ? double.Parse(await _preview.CoreWebView2.ExecuteScriptAsync("window.scrollY"), System.Globalization.CultureInfo.InvariantCulture) : 0; }
             catch { _scroll = 0; }
@@ -709,11 +709,12 @@ namespace NoteChange
             sb.Append("li::before{content:counter(s);flex:0 0 26px;height:26px;border-radius:50%;background:rgba(255,181,71,.16);color:#ffb547;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}");
             sb.Append(".row{display:flex;flex-wrap:wrap;gap:8px}button{font:inherit;font-size:13.5px;font-weight:600;border-radius:9px;padding:9px 14px;cursor:pointer;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.06);color:#f3f1ec}");
             sb.Append("button:hover{background:rgba(255,255,255,.11)}button.primary{background:#ffb547;border-color:#ffb547;color:#1a1206}button:focus-visible{outline:2px solid #ffb547;outline-offset:2px}");
+            sb.Append("::-webkit-scrollbar{width:12px}::-webkit-scrollbar-track{background:#0b0d11}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:6px;border:3px solid #0b0d11}::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.28)}");
             sb.Append(".small{color:#6e737e;font-size:12.5px;margin:20px 0 0}</style></head><body><div class='wrap'>");
             sb.Append("<div class='eyebrow'>YOUR NOTES, READY TO SHARE</div>");
             sb.Append("<h1>Turn a note into a proper document.</h1>");
             sb.Append("<p>Recipes, chapters and everyday notes, laid out neatly as Word documents, PDFs or emails. Every word stays exactly as you wrote it.</p>");
-            sb.Append("<ol><li>Open iCloud Notes and sign in with your Apple Account.</li><li>Choose a note and press <b>Add this note</b>. Add as many as you like.</li><li>Pick a style on the right, then save as Word or PDF.</li></ol>");
+            sb.Append("<ol><li><span>Open iCloud Notes and sign in with your Apple Account.</span></li><li><span>Choose a note and press <b>Add this note</b>. Add as many as you like.</span></li><li><span>Pick a style on the right, then save as Word or PDF.</span></li></ol>");
             sb.Append("<div class='row'><button class='primary' onclick=\"chrome.webview.postMessage('icloud')\">Open iCloud Notes</button>");
             sb.Append("<button onclick=\"chrome.webview.postMessage('paste')\">Paste a note</button></div>");
             sb.Append("<p class='small'>Or try an example:</p><div class='row'>");

@@ -55,6 +55,13 @@ jobs:
           -p:EnableCompressionInSingleFile=true -p:DebugType=embedded
           -p:Version=${{ steps.ver.outputs.version }} -o publish -nologo
 
+      - name: Use a full HD screen for screenshots
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          Set-DisplayResolution -Width 1920 -Height 1080 -Force
+          Get-CimInstance Win32_VideoController | Select-Object CurrentHorizontalResolution, CurrentVerticalResolution
+
       - name: Test the built app
         shell: pwsh
         run: |

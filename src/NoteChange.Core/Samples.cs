@@ -25,9 +25,9 @@ public static class Samples
 
     public static NoteSource Checklist() => NoteSource.FromHtml(
         "<div>Weekend in the Lakes</div>" +
-        "<div>Packing</div>" +
+        "<h2>Packing</h2>" +
         "<ul class=\"checklist\"><li>☑ Walking boots</li><li>☑ Waterproofs</li><li>☐ Flask and snacks</li><li>☐ OS map for Helvellyn</li></ul>" +
-        "<div>Plan</div>" +
+        "<h2>Plan</h2>" +
         "<table><tr><th>Day</th><th>Walk</th><th>Distance</th></tr><tr><td>Saturday</td><td>Catbells</td><td>3.5 miles</td></tr><tr><td>Sunday</td><td>Tarn Hows</td><td>2 miles</td></tr></table>" +
         "<div>Book the pub for Saturday night: <a href=\"https://example.com\">table for four</a>.</div>",
         "Weekend in the Lakes", "example");
