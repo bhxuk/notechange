@@ -1,0 +1,29 @@
+NoteChange 1.0.0 self-test, 2026-10-14 23:34:27Z
+ok    WebView2 runtime  (153.0.4234.48)
+ok    Welcome page renders
+shot  welcome.png
+ok    Recipe added
+ok    Recipe preview renders
+ok    Chapter added
+ok    Chapter preview renders
+shot  chapter.png
+ok    Checklist added
+ok    Checklist preview renders
+shot  checklist.png
+ok    Recipe preview renders again
+shot  recipe.png
+ok    Preview shows the recipe
+ok    Word file is valid  (5433 bytes)
+ok    Word file has every note
+ok    PDF is written  (81669 bytes)
+ok    PDF starts each note on a new page  (3 pages)
+ok    Email draft is written
+ok    Markdown is written
+ok    Text is written
+ok    Reads a note inside an iCloud frame  (1 frame(s))
+ok    Note title  (Garden jobs)
+ok    Bold and italic from styles
+ok    Checklist ticks  (☑ Mow the lawn / ☐ Weed the beds)
+ok    Pictures come across (PNG kept, GIF converted)  (2 picture(s))
+ok    Clipboard HTML format
+PASSED
