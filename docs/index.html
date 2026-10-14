@@ -72,7 +72,7 @@ h1 .grad{background:linear-gradient(92deg,var(--amber) 10%,#F28A5B 55%,var(--cor
 .float .dot{width:30px;height:30px;border-radius:10px;display:grid;place-items:center}
 .float .dot svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .float small{display:block;color:var(--muted);font-weight:500;font-size:12px}
-.f1{left:-28px;top:8%}.f2{right:-28px;top:44%}.f3{left:8%;bottom:-24px}
+.f1{left:-28px;top:44%}.f2{right:-28px;top:74%}.f3{left:34%;bottom:-24px}
 @media (max-width:900px){.stage .float{display:none}}
 
 /* strip */
@@ -148,6 +148,10 @@ h2{font-family:var(--display);font-size:clamp(30px,4.4vw,48px);line-height:1.08;
 .pages i::before{content:"";position:absolute;left:14%;right:30%;top:14%;height:7%;border-radius:3px;background:#20242e}
 .pages i::after{content:"";position:absolute;left:14%;right:14%;top:30%;height:44%;background:repeating-linear-gradient(180deg,#d4d7de 0 6%,transparent 6% 14%)}
 .pages i:nth-child(2){background:#fffdf7}.pages i:nth-child(2)::before{left:25%;right:25%}
+.stack{display:grid;gap:6px;margin-top:16px}
+.stack span{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13.5px;color:#dcdad5}
+.stack span small{color:var(--muted);font-size:12px}
+.stack span.on{background:rgba(255,181,71,.12);border-color:rgba(255,181,71,.45)}
 
 /* privacy */
 .why{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:16px;margin-top:40px}
@@ -341,6 +345,7 @@ footer small{display:block;margin-top:16px;font-size:12.5px;opacity:.8}
       <div class="b-small">
         <h3>Collections</h3>
         <p>Put notes in order and save them as one document, each on a new page. Save the collection to carry on later.</p>
+        <div class="stack" aria-hidden="true"><span class="on">Lemon drizzle cake<small>1</small></span><span>Chapter One<small>2</small></span><span>Weekend in the Lakes<small>3</small></span></div>
       </div>
       <div class="b-wide">
         <h3>Quick with a keyboard</h3>
@@ -366,7 +371,7 @@ footer small{display:block;margin-top:16px;font-size:12.5px;opacity:.8}
     </div>
     <div class="why">
       <div><span class="ic amber"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></span><h3>Everything on your PC</h3><p>Layouts, previews and exports all happen on your computer. Previews are built in memory.</p></div>
-      <div><span class="ic teal"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><h3>Apple handles sign-in</h3><p>You sign in on Apple's own page. NoteChange never sees your password, and Sign out removes everything.</p></div>
+      <div><span class="ic teal"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><h3>Apple handles sign-in</h3><p>You sign in on Apple's own page. NoteChange never sees your password, and Sign out removes your sign-in from this PC.</p></div>
       <div><span class="ic coral"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span><h3>Read-only</h3><p>NoteChange only reads the note you choose, when you press the button. It never changes anything in iCloud.</p></div>
       <div><span class="ic amber"><svg viewBox="0 0 24 24"><path d="M4 19h4L19 8l-4-4L4 15z"/><path d="m13 6 4 4"/></svg></span><h3>No rewriting</h3><p>No AI and no summaries. It lays your words out; it never changes them.</p></div>
     </div>
