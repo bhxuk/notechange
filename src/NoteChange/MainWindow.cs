@@ -654,7 +654,7 @@ namespace NoteChange
         }
 
         /// <summary>Waits for the preview to finish drawing (used by the self-test and screenshots).</summary>
-        public Task Rendered => _rendered.Task;
+        public Task<bool> Rendered => _rendered.Task;
 
         private async void Refresh()
         {

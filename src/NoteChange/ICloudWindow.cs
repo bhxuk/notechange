@@ -151,8 +151,6 @@ namespace NoteChange
         {
             _frames.Add(frame);
             frame.Destroyed += (s, e) => _frames.Remove(frame);
-            try { frame.FrameCreated += (s, e) => Track(e.Frame); }
-            catch { /* Older WebView2 runtimes don't report frames inside frames. */ }
         }
 
         public static bool AppleUrl(string url)
