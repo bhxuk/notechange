@@ -81,6 +81,15 @@ jobs:
         run: |
           $out = Join-Path $env:RUNNER_TEMP 'self-test'
           if (-not (Test-Path $out)) { exit 0 }
+          # Pictures of the website too, at desktop and phone widths.
+          $edge = "${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe"
+          if (-not (Test-Path $edge)) { $edge = "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe" }
+          $site = 'file:///' + ((Resolve-Path docs\index.html).Path -replace '\\', '/')
+          foreach ($size in @('1440,6400', '390,9000')) {
+            $name = if ($size.StartsWith('1440')) { 'site-desktop.png' } else { 'site-phone.png' }
+            $p = Start-Process -FilePath $edge -ArgumentList '--headless=new', '--disable-gpu', '--hide-scrollbars', "--window-size=$size", '--virtual-time-budget=8000', "--screenshot=$out\$name", $site -PassThru
+            $null = $p.WaitForExit(60000)
+          }
           $dir = Join-Path $env:RUNNER_TEMP 'review'
           $remote = "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
           git init -q $dir
