@@ -71,9 +71,11 @@ namespace NoteChange
                 if (screenshots) await Shot(window, Path.Combine(output, "chapter.png"));
                 Check("Checklist added", window.AddNote(Samples.Checklist(), false));
                 Check("Checklist preview renders", await Wait(window.Rendered));
+                window.SetStatus("Added \u201CWeekend in the Lakes\u201D.");
                 if (screenshots) await Shot(window, Path.Combine(output, "checklist.png"));
                 window.SelectNote(0);
                 Check("Recipe preview renders again", await Wait(window.Rendered));
+                window.SetStatus("Ready. Your notes stay on this PC.");
                 if (screenshots) await Shot(window, Path.Combine(output, "recipe.png"));
 
                 string html = await window.PreviewCore.ExecuteScriptAsync("document.body.innerText");

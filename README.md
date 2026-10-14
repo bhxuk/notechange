@@ -1,55 +1,96 @@
+<div align="center">
+
+<img src="docs/images/icon.png" alt="The NoteChange icon: a note page on an amber tile" width="120">
+
 # NoteChange
 
-Turn iCloud notes into clean Word documents, PDFs, recipes and book chapters. Choose a note, preview a layout and export it with the original wording preserved.
+**Your notes, ready to share.**
 
-[Download the latest public preview](https://github.com/bhxuk/notechange/releases) · [Quick guide](docs/USER-GUIDE.md) · [Privacy](docs/PRIVACY.md)
+Turn iCloud notes into Word documents, PDFs and emails for Windows. Recipes get proper Ingredients and Method headings,
+stories get book typography, and everything else gets a clean, simple layout. Every word stays exactly as you wrote it.
 
-## Features
+**[Download NoteChange for Windows](https://github.com/bhxuk/notechange/releases/latest/download/NoteChange-Setup.exe)**  ·  [Website](https://bhxuk.github.io/notechange/)  ·  [User guide](docs/USER-GUIDE.md)  ·  [What's new](CHANGELOG.md)
 
-- Sign in on Apple's own iCloud page and select a note in the embedded Apple Notes interface.
-- Add the opened note to your collection with one button, or paste a note from any source.
-- Automatic, document, recipe and chapter layouts. Existing recipe section labels become headings; words and order stay unchanged.
-- Preview before saving. Bold, italic, headings, lists, checklists, hyperlinks, basic tables and supported PNG/JPEG pictures.
-- Collect/reorder notes and combine them into one Word document or PDF. Each chapter starts on a new page.
-- Word, PDF, text, Markdown, email draft and rich email clipboard export. Email subject is empty; title appears in the message.
-- Save and reopen local project files. Memory-only workspace; no cloud conversion service or AI rewriting.
-- Windows per-user installer, desktop/Start menu shortcuts and versioned GitHub update channel.
+<img src="docs/images/recipe.png" alt="NoteChange showing a lemon drizzle cake recipe laid out as a document, with the collection on the left and style and export options on the right" width="900">
 
-**Public preview:** real Apple sign-in/2FA/device approval and current live note capture are not yet acceptance-tested. Do not describe this release as production-certified. The installer is unsigned. Unsupported attachments and merged table cells need checking. A paste fallback is always available. See [release notes](docs/RELEASE-NOTES.md).
+</div>
 
-## Build and test
+---
 
-Requires Node.js 22+ and a graphical desktop to run Electron.
+## What it does
 
-```sh
-npm ci
-npm run check
-npm test
-npm run smoke
-npm start
+| | |
+|---|---|
+| **Brings notes across from iCloud** | Sign in on Apple's own iCloud page inside NoteChange, open a note and press **Add this note**. Add as many as you like to build a collection. |
+| **Lays them out for you** | **Automatic** picks a style. **Recipe** turns Ingredients, Method and Notes into headings. **Chapter** uses serif type and indented paragraphs. **Document** keeps it clean. |
+| **Keeps your words** | Nothing is rewritten, summarised or reordered. Bold, italics, underlines, links, lists, checklists, simple tables and pictures come across. |
+| **Saves the way you need** | Word (.docx), PDF (A4), a ready-to-send email draft (.eml), Copy for email, plain text and Markdown. |
+| **Handles collections** | Put notes in order and export them as one document, each starting on a new page. Save the collection and open it again later. |
+| **Stays on your PC** | No account, no cloud conversion, no AI. Your Apple sign-in is handled by Apple and kept in NoteChange's own browser on this PC. |
+
+You can also paste a note from anywhere, open `.txt`, `.md` and `.html` files, or drag them onto the window.
+
+## Install
+
+1. Download **[NoteChange-Setup.exe](https://github.com/bhxuk/notechange/releases/latest/download/NoteChange-Setup.exe)**.
+2. Double-click it. No admin rights needed; it installs just for you.
+3. Windows may say **"Windows protected your PC"** because the installer isn't code-signed. Click **More info**, then **Run anyway**.
+
+NoteChange runs on Windows 10 (1809 or later) and Windows 11, 64-bit. It uses the Microsoft Edge WebView2 Runtime, which is already on Windows 11 and almost every Windows 10 PC; Setup tells you if it's missing.
+NoteChange checks for updates and installs them with one click.
+
+## A quick tour
+
+### Book chapters
+
+<img src="docs/images/chapter.png" alt="A story laid out as a book chapter with a centred title and indented serif paragraphs" width="900">
+
+### Checklists and tables
+
+<img src="docs/images/checklist.png" alt="A packing checklist with ticked and unticked items and a table of walks" width="900">
+
+## Good to know
+
+- Notes must be in iCloud. Notes kept only "On My iPhone" don't appear on iCloud.com, so copy them and use **Paste note**.
+- Locked notes need unlocking in iCloud first.
+- Attachments other than pictures (PDFs, audio, sketches) stay in Apple Notes.
+- Reading iCloud Notes works through Apple's web page, not an official Apple API. If Apple changes that page, NoteChange may need an update; **Paste note** always works.
+
+## Build it yourself
+
+You need the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) on Windows.
+
+```powershell
+dotnet test tests/NoteChange.Tests
+dotnet run --project src/NoteChange
 ```
 
-Build on Windows with `npm run dist`. The real Windows smoke test exercises preload/IPC, example-note selection, recipe/chapter preview, Word generation and multi-note PDF output in Electron; it does not pretend to verify an authenticated Apple session.
+Make the single-file app and check it end to end:
 
-## GitHub releases and updates
+```powershell
+dotnet publish src/NoteChange -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish
+publish\NoteChange.exe --self-test "$env:TEMP\notechange-test"
+```
 
-Main source changes run checks, conversion/capture tests, Windows Electron smoke and installer packaging. Versions containing `-beta.` are published as public prereleases; published files are immutable and are not overwritten when the version already exists. Bump the package version for every distributed change. The beta app opts into the GitHub prerelease channel. Stable versions require a matching explicit version tag and the tagged-release workflow. Installer updates download automatically and are installed only after an explicit restart action. Save a project before updating; workspace notes are in memory.
+The self-test opens the real window, renders every example, writes Word, PDF, email, text and Markdown files, and reads a note from a stand-in iCloud page.
+`installer/NoteChange.iss` builds `NoteChange-Setup.exe` with [Inno Setup 6](https://jrsoftware.org/isinfo.php).
 
-GitHub Actions needs `contents: write` for release assets. Code signing is not configured. Never embed signing secrets, Apple credentials or a GitHub token in the app. Signing can be added to Windows CI with protected signing credentials before a production release.
+Every push to `main` is built and tested on Windows by GitHub Actions. When the version in `src/NoteChange/NoteChange.csproj` changes, a new release with `NoteChange-Setup.exe` is published automatically.
 
-## iCloud integration
+### Project layout
 
-Remote Apple pages run without the application preload or Node access, with sandboxing and context isolation. Apple authentication popups keep their browser opener relationship. Capture runs only on Notes frames after an explicit click, accepts one editor or an identifiable title/body pair, reads content without changing it, copies supported images and preserves common computed text emphasis. Ambiguous editors fail safely. This is a page adapter, **not an official Apple Notes API**. Apple page changes may require adapter updates.
+| Folder | What's in it |
+|---|---|
+| `src/NoteChange.Core` | Reading notes, layouts and every export format. No Windows code, so it's fully unit-tested. |
+| `src/NoteChange` | The Windows app: main window, iCloud window, preview, PDF printing and updates. |
+| `tests` | Conversion tests, including checking the Word output against the Open XML schema. |
+| `installer` | The Inno Setup script. |
+| `docs` | The website, user guide and privacy notes. |
 
-Notes must be stored in iCloud. Locked notes must be unlocked in Apple Notes. Advanced Data Protection/web access can require trusted-device approval. Arbitrary attachments and complex layouts are not guaranteed to transfer. CSS-only or custom editor content should be compared with the source during acceptance testing.
+## Privacy
 
-## Public-release acceptance
+See [docs/PRIVACY.md](docs/PRIVACY.md). In short: NoteChange has no servers. It talks to iCloud (to show your notes) and to GitHub (to check for updates), and nothing else.
 
-- Real account sign-in, 2FA, trusted-device approval, note viewing/capture, sign-out and repeat launch.
-- Compare a recipe, long chapter, checklist, nested list, table and picture with the exact source wording.
-- Windows install/launch/uninstall, 125–200% scaling and keyboard navigation.
-- Open Word/PDF exports and test the intended Outlook client, including blank subject and rich paste.
-- Install an older version and verify a complete GitHub update cycle.
-- Review code signing and make the download/installation experience understandable for first-time users.
+---
 
-MIT licensed. Apple Notes and iCloud are Apple services; NoteChange is an independent application and is not endorsed by Apple.
+MIT licensed. Apple, iCloud and Apple Notes are trademarks of Apple Inc. NoteChange is an independent app and isn't made or endorsed by Apple.

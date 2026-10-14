@@ -114,7 +114,9 @@ namespace NoteChange
     <Setter Property='Background' Value='#0F1115'/>
     <Setter Property='BorderBrush' Value='#22FFFFFF'/>
     <Setter Property='BorderThickness' Value='1'/>
-    <Setter Property='Padding' Value='10,8'/>
+    <Setter Property='Padding' Value='10,0'/>
+    <Setter Property='Height' Value='38'/>
+    <Setter Property='VerticalContentAlignment' Value='Center'/>
     <Setter Property='FontSize' Value='13.5'/>
     <Setter Property='CaretBrush' Value='#FFB547'/>
     <Setter Property='SelectionBrush' Value='#FFB547'/>

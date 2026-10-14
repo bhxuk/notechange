@@ -130,14 +130,14 @@ public static class HtmlExporter
 .page td,.page th{border:1px solid #c9ced8;padding:.4em .6em;text-align:left;vertical-align:top}
 .page th{background:#f2f3f6}
 .page.layout-recipe h1{padding-bottom:.45em;border-bottom:3px solid #d98a1c}
-.page.layout-recipe h2{color:#a55f00;font-size:.95em;text-transform:uppercase;letter-spacing:.09em;margin-top:1.6em}
+.page.layout-recipe h2,.page.layout-recipe h3{color:#a55f00;font-size:.95em;text-transform:uppercase;letter-spacing:.09em;margin-top:1.6em}
 .page.layout-recipe ol li{margin:.45em 0}
 .page.layout-chapter{font-family:Georgia,'Times New Roman',serif;line-height:1.8}
 .page.layout-chapter h1{text-align:center;font-weight:400;font-size:1.9em;margin-bottom:1.2em}
 .page.layout-chapter h1::after{content:'';display:block;width:56px;height:1px;background:#9aa1ad;margin:.7em auto 0}
 .page.layout-chapter p{text-indent:1.5em;margin:0;text-align:justify;hyphens:auto}
-.page.layout-chapter h1+p,.page.layout-chapter h2+p,.page.layout-chapter p.figure{text-indent:0}
-.page.layout-chapter h2{text-align:center;font-weight:400;font-style:italic}
+.page.layout-chapter h1+p,.page.layout-chapter h2+p,.page.layout-chapter h3+p,.page.layout-chapter p.figure{text-indent:0}
+.page.layout-chapter h2,.page.layout-chapter h3{text-align:center;font-weight:400;font-style:italic}
 ";
 
     /// <summary>The live preview: paper pages on a dark desk.</summary>

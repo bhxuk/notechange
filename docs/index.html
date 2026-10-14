@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NoteChange for Windows</title>
+<meta name="description" content="Turn iCloud notes into Word documents, PDFs and emails on Windows. Recipes, book chapters and everyday notes, laid out neatly, with every word kept exactly as you wrote it.">
+<meta property="og:title" content="NoteChange for Windows">
+<meta property="og:description" content="Your notes, ready to share.">
+<meta property="og:image" content="https://bhxuk.github.io/notechange/images/recipe.png">
+<meta name="theme-color" content="#07080d">
+<link rel="icon" href="images/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080d;--panel:#10121a;--panel2:#151823;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.14);
+  --text:#f4f2ee;--muted:rgba(244,242,238,.62);--amber:#FFB547;--teal:#5ED3C3;--coral:#E2585F;
+  --display:'Sora',system-ui,sans-serif;--body:'Figtree',"Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+img{display:block;max-width:100%;height:auto}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;z-index:20;background:var(--amber);color:#1a1206;padding:8px 14px;border-radius:10px}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+/* island navigation */
+.island{position:sticky;top:0;z-index:10;display:flex;justify-content:center;pointer-events:none}
+.island nav{pointer-events:auto;display:flex;align-items:center;gap:6px;background:#000;border:1px solid rgba(255,255,255,.06);border-top:0;border-radius:0 0 24px 24px;padding:8px 8px 8px 16px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.island .brand{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:700;font-size:15px;text-decoration:none;margin-right:8px}
+.island .brand img{width:22px;height:22px}
+.island a.link{text-decoration:none;color:var(--muted);font-size:14px;font-weight:500;padding:8px 12px;border-radius:999px}
+.island a.link:hover{color:var(--text);background:rgba(255,255,255,.06)}
+.island a.get{text-decoration:none;background:var(--amber);color:#1a1206;font-weight:700;font-size:14px;padding:8px 16px;border-radius:999px}
+.island a.get:hover{filter:brightness(1.07)}
+@media (max-width:640px){.island a.link{display:none}}
+
+/* hero */
+header.hero{position:relative;text-align:center;padding:84px 0 0;isolation:isolate}
+.glow{position:absolute;inset:-160px 0 auto;height:900px;z-index:-1;pointer-events:none;
+  background:
+   radial-gradient(560px 340px at 50% 26%,rgba(255,181,71,.22),transparent 70%),
+   radial-gradient(520px 300px at 16% 18%,rgba(94,211,195,.12),transparent 70%),
+   radial-gradient(520px 300px at 86% 20%,rgba(226,88,95,.12),transparent 70%)}
+.paper-bg{position:absolute;inset:-80px 0 auto;height:760px;z-index:-1;pointer-events:none;opacity:.5;
+  background-image:repeating-linear-gradient(180deg,transparent 0 35px,rgba(255,255,255,.035) 35px 36px);
+  -webkit-mask-image:radial-gradient(70% 60% at 50% 30%,#000,transparent);mask-image:radial-gradient(70% 60% at 50% 30%,#000,transparent)}
+.badge{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-size:13.5px;font-weight:600;color:var(--text);background:rgba(255,255,255,.05);border:1px solid var(--line2);padding:6px 14px 6px 6px;border-radius:999px}
+.badge span{background:var(--amber);color:#1a1206;font-weight:700;padding:2px 10px;border-radius:999px;font-size:12px}
+.badge:hover{background:rgba(255,255,255,.08)}
+h1{font-family:var(--display);font-size:clamp(40px,7vw,78px);line-height:1.02;letter-spacing:-.035em;font-weight:600;margin-top:26px}
+h1 .grad{background:linear-gradient(92deg,var(--amber) 10%,#F28A5B 55%,var(--coral) 95%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{max-width:660px;margin:22px auto 0;font-size:clamp(17px,2.2vw,19.5px);color:var(--muted)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:32px}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:50px;padding:0 24px;border-radius:999px;font-weight:700;font-size:15.5px;text-decoration:none;border:1px solid var(--line2);transition:transform .15s ease,filter .15s ease,background .15s ease}
+.btn svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.btn.primary{background:var(--amber);color:#1a1206;border-color:transparent;box-shadow:0 10px 30px rgba(255,181,71,.25)}
+.btn.primary:hover{filter:brightness(1.07);transform:translateY(-1px)}
+.btn.ghost:hover{background:rgba(255,255,255,.06)}
+.meta{margin-top:16px;font-size:13.5px;color:var(--muted)}
+.meta b{color:var(--text);font-weight:600}
+
+.stage{position:relative;margin-top:56px}
+.stage::before{content:"";position:absolute;left:50%;top:-60px;width:min(560px,70%);aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,181,71,.32),rgba(255,181,71,0) 65%);z-index:-1;filter:blur(10px)}
+.frame{border-radius:20px;padding:8px;background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.03));box-shadow:0 50px 120px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04)}
+.frame img{border-radius:14px;width:100%}
+.stage .float{position:absolute;display:flex;align-items:center;gap:10px;background:rgba(10,11,16,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line2);border-radius:16px;padding:10px 14px;font-size:13.5px;font-weight:600;box-shadow:0 20px 50px rgba(0,0,0,.45);white-space:nowrap;text-align:left}
+.float .dot{width:30px;height:30px;border-radius:10px;display:grid;place-items:center}
+.float .dot svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.float small{display:block;color:var(--muted);font-weight:500;font-size:12px}
+.f1{left:-28px;top:8%}.f2{right:-28px;top:44%}.f3{left:8%;bottom:-24px}
+@media (max-width:900px){.stage .float{display:none}}
+
+/* strip */
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-top:96px}
+.strip div{background:var(--bg);padding:22px 20px;text-align:center}
+.strip b{display:block;font-family:var(--display);font-size:30px;font-weight:600;letter-spacing:-.02em}
+.strip span{color:var(--muted);font-size:14px}
+@media (max-width:700px){.strip{grid-template-columns:repeat(2,1fr)}}
+
+/* sections */
+section{padding:110px 0 0}
+.kicker{color:var(--amber);font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase}
+h2{font-family:var(--display);font-size:clamp(30px,4.4vw,48px);line-height:1.08;letter-spacing:-.03em;font-weight:600;margin-top:10px}
+.intro{color:var(--muted);max-width:640px;margin-top:14px;font-size:17.5px}
+.center{text-align:center}.center .intro{margin-left:auto;margin-right:auto}
+
+/* how it works */
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px;counter-reset:h}
+.how div{counter-increment:h;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:22px;padding:26px;position:relative}
+.how div::before{content:counter(h);display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--amber);color:#1a1206;font-family:var(--display);font-weight:700;margin-bottom:16px}
+.how h3{font-size:18px;margin-bottom:6px}
+.how p{color:var(--muted);font-size:15px}
+@media (max-width:820px){.how{grid-template-columns:1fr}}
+
+/* before / after */
+.ba{display:grid;grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr);align-items:center;gap:0;margin-top:44px}
+.note{background:#fdf6dc;color:#2b2a26;border-radius:18px;padding:26px 26px 30px;font-family:-apple-system,"SF Pro Text","Segoe UI",sans-serif;font-size:15px;line-height:1.55;box-shadow:0 30px 70px rgba(0,0,0,.45);transform:rotate(-1.2deg)}
+.note .bar{display:flex;justify-content:space-between;color:#b08d2f;font-size:12px;font-weight:700;letter-spacing:.06em;margin-bottom:14px}
+.note b{font-size:19px}
+.arrow{display:grid;place-items:center;color:var(--amber)}
+.arrow svg{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.doc{background:#fff;color:#1d2330;border-radius:12px;padding:34px 36px 38px;box-shadow:0 30px 70px rgba(0,0,0,.45);font-family:Calibri,Carlito,"Segoe UI",sans-serif;font-size:15px;line-height:1.55;transform:rotate(.8deg)}
+.doc h4{font-size:26px;line-height:1.15;padding-bottom:10px;border-bottom:3px solid #d98a1c;margin-bottom:14px;letter-spacing:-.01em}
+.doc h5{color:#a55f00;text-transform:uppercase;letter-spacing:.09em;font-size:12.5px;margin:16px 0 6px}
+.doc ul,.doc ol{padding-left:22px}
+.doc .file{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-family:var(--body);font-size:12.5px;font-weight:700;color:#2b579a;background:#e8eef8;border-radius:999px;padding:4px 10px}
+@media (max-width:820px){.ba{grid-template-columns:1fr;gap:14px}.arrow svg{transform:rotate(90deg)}}
+
+/* tour tabs */
+.tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:36px}
+.tab{appearance:none;font:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:8px;color:var(--muted);background:transparent;border:1px solid var(--line2);padding:10px 16px;border-radius:999px;font-size:14.5px;font-weight:600;min-height:44px;transition:all .15s ease}
+.tab:hover{color:var(--text);border-color:rgba(255,255,255,.28)}
+.tab[aria-selected="true"]{background:var(--text);color:#0b0c10;border-color:var(--text)}
+.panel{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:40px;align-items:center;margin-top:40px;animation:fade .35s ease}
+.panel[hidden]{display:none}
+.panel h3{font-family:var(--display);font-size:28px;letter-spacing:-.02em;font-weight:600}
+.panel p{color:var(--muted);margin-top:10px}
+.panel ul{list-style:none;margin-top:18px;display:grid;gap:10px}
+.panel li{position:relative;padding-left:28px;color:#dcdad5;font-size:15.5px}
+.panel li::before{content:"";position:absolute;left:2px;top:.5em;width:12px;height:7px;border-left:2.4px solid var(--teal);border-bottom:2.4px solid var(--teal);transform:rotate(-45deg)}
+.panel .shot{border-radius:16px;padding:6px;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.03));box-shadow:0 30px 80px rgba(0,0,0,.55)}
+.panel .shot img{border-radius:11px;width:100%}
+@media (max-width:860px){.panel{grid-template-columns:1fr;gap:24px}}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* bento */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-top:40px}
+.bento > div{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:24px;overflow:hidden;position:relative}
+.bento h3{font-size:17px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.bento p{color:var(--muted);font-size:14.5px}
+.b-wide{grid-column:span 4}.b-mid{grid-column:span 3}.b-small{grid-column:span 2}
+@media (max-width:860px){.b-wide,.b-mid,.b-small{grid-column:span 6}}
+.ext{font-family:var(--body);font-size:11.5px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:7px}
+.x-word{background:#e1eaf8;color:#2b579a}.x-pdf{background:#fbe3e3;color:#b4232a}.x-eml{background:#e2f2ee;color:#1d7766}.x-md{background:rgba(255,255,255,.1);color:var(--text)}
+.formats{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.formats span{border:1px solid var(--line2);border-radius:999px;padding:5px 12px;font-size:13.5px;color:#dcdad5}
+.keys{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+.keys div{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px}
+.keys kbd{font-family:var(--body);font-size:12px;font-weight:700;background:rgba(255,255,255,.09);border:1px solid var(--line2);border-bottom-width:2px;padding:2px 8px;border-radius:7px;white-space:nowrap}
+@media (max-width:520px){.keys{grid-template-columns:1fr}}
+.pages{display:flex;gap:10px;margin-top:18px}
+.pages i{flex:1;aspect-ratio:.72;border-radius:6px;background:#fff;position:relative;box-shadow:0 10px 24px rgba(0,0,0,.35)}
+.pages i::before{content:"";position:absolute;left:14%;right:30%;top:14%;height:7%;border-radius:3px;background:#20242e}
+.pages i::after{content:"";position:absolute;left:14%;right:14%;top:30%;height:44%;background:repeating-linear-gradient(180deg,#d4d7de 0 6%,transparent 6% 14%)}
+.pages i:nth-child(2){background:#fffdf7}.pages i:nth-child(2)::before{left:25%;right:25%}
+
+/* privacy */
+.why{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:16px;margin-top:40px}
+.why div{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:22px;padding:26px}
+.why .ic{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;margin-bottom:18px}
+.ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.amber{background:rgba(255,181,71,.14);color:var(--amber)}.teal{background:rgba(94,211,195,.14);color:var(--teal)}.coral{background:rgba(226,88,95,.14);color:#F07C82}
+.why h3{font-size:18px;margin-bottom:6px}
+.why p{color:var(--muted);font-size:15px}
+
+/* install */
+.install{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:40px;align-items:start;margin-top:8px}
+@media (max-width:860px){.install{grid-template-columns:1fr}}
+ol.steps{list-style:none;counter-reset:s;display:grid;gap:12px}
+ol.steps li{counter-increment:s;position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px 20px 18px 68px;color:var(--muted)}
+ol.steps li b{color:var(--text);display:block;margin-bottom:2px}
+ol.steps li::before{content:counter(s);position:absolute;left:20px;top:18px;width:32px;height:32px;border-radius:50%;background:var(--amber);color:#1a1206;font-weight:700;display:grid;place-items:center;font-family:var(--display);font-size:15px}
+.warn{margin-top:14px;background:rgba(255,181,71,.07);border:1px solid rgba(255,181,71,.25);border-radius:16px;padding:16px 18px;font-size:14.5px;color:#e8e2d4}
+.warn b{color:var(--amber)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:0 20px;margin-bottom:10px}
+summary{cursor:pointer;font-weight:700;padding:18px 0;list-style:none;display:flex;justify-content:space-between;gap:14px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--amber);font-size:22px;line-height:1;flex:none}
+details[open] summary::after{content:"\2013"}
+details p{color:var(--muted);font-size:15px;padding-bottom:18px}
+details a{color:var(--amber)}
+
+/* closing */
+.final{margin-top:110px;text-align:center;border-radius:28px;padding:64px 24px;background:radial-gradient(600px 300px at 50% 0%,rgba(255,181,71,.18),transparent 70%),var(--panel);border:1px solid var(--line)}
+.final img{width:84px;height:84px;margin:0 auto 18px}
+footer{padding:56px 0 48px;color:var(--muted);font-size:14px}
+footer .row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;border-top:1px solid var(--line);padding-top:26px}
+footer nav{display:flex;flex-wrap:wrap;gap:18px}
+footer a{text-decoration:none}footer a:hover{color:var(--text)}
+footer small{display:block;margin-top:16px;font-size:12.5px;opacity:.8}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="island">
+  <nav aria-label="Main">
+    <a class="brand" href="#top"><img src="images/icon.png" alt="">NoteChange</a>
+    <a class="link" href="#how">How it works</a>
+    <a class="link" href="#styles">Styles</a>
+    <a class="link" href="#share">Sharing</a>
+    <a class="link" href="#privacy">Privacy</a>
+    <a class="link" href="#faq">FAQ</a>
+    <a class="get" href="https://github.com/bhxuk/notechange/releases/latest/download/NoteChange-Setup.exe">Download</a>
+  </nav>
+</div>
+
+<header class="hero" id="top">
+  <div class="glow"></div><div class="paper-bg"></div>
+  <div class="wrap">
+    <a class="badge" href="https://github.com/bhxuk/notechange/blob/main/CHANGELOG.md"><span>New</span>Version 1.0, rebuilt for Windows</a>
+    <h1>Your notes,<br><span class="grad">ready to share.</span></h1>
+    <p class="lead">Turn iCloud notes into Word documents, PDFs and emails. Recipes, book chapters and everyday notes come out neatly laid out, and every word stays exactly as you wrote it.</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/bhxuk/notechange/releases/latest/download/NoteChange-Setup.exe">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>Download for Windows</a>
+      <a class="btn ghost" href="#how">See how it works</a>
+    </div>
+    <p class="meta"><b>Free</b> · Windows 10 and 11 · No account · Nothing leaves your PC</p>
+
+    <div class="stage">
+      <div class="frame"><img src="images/recipe.png" width="1920" height="1080" alt="NoteChange with a lemon drizzle cake recipe laid out as a document. The collection is on the left, and style and saving options are on the right."></div>
+      <div class="float f1"><span class="dot amber"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></span><span>Recipe layout<small>Picked automatically</small></span></div>
+      <div class="float f2"><span class="dot teal"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="m9 14 2 2 4-4"/></svg></span><span>Lemon drizzle cake.docx<small>Saved as Word</small></span></div>
+      <div class="float f3"><span class="dot coral"><svg viewBox="0 0 24 24"><path d="M4 19h4L19 8l-4-4L4 15z"/><path d="m13 6 4 4"/></svg></span><span>Nothing rewritten<small>Your words, your order</small></span></div>
+    </div>
+
+    <div class="strip">
+      <div><b>4</b><span>layouts, picked for you</span></div>
+      <div><b>6</b><span>ways to save and share</span></div>
+      <div><b>100</b><span>notes in one document</span></div>
+      <div><b>0</b><span>servers, accounts or AI</span></div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+<section id="how">
+  <div class="wrap center">
+    <div class="kicker">How it works</div>
+    <h2>From a note on your phone to a document you can send.</h2>
+    <p class="intro">NoteChange opens iCloud right inside the app. Sign in once, pick a note, and it's ready to save.</p>
+    <div class="how" style="text-align:left">
+      <div><h3>Open iCloud Notes</h3><p>Sign in on Apple's own iCloud page, with two-factor codes and device approval working as usual.</p></div>
+      <div><h3>Add this note</h3><p>Open a note and press one button. Keep going to collect a whole cookbook, a story or a project.</p></div>
+      <div><h3>Save as Word or PDF</h3><p>Pick a style, check the preview and save. Or copy it straight into an email.</p></div>
+    </div>
+
+    <div class="ba" aria-label="A note before and after NoteChange">
+      <div class="note" style="text-align:left">
+        <div class="bar"><span>NOTES</span><span>Today 18:42</span></div>
+        <b>Lemon drizzle cake</b><br>Serves 8 · about an hour<br><br>Ingredients<br>• 225 g soft butter<br>• 225 g caster sugar<br>• 4 eggs<br><br>Method<br>1. Heat the oven to 180°C<br>2. Beat the butter and sugar…
+      </div>
+      <div class="arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg></div>
+      <div class="doc" style="text-align:left">
+        <h4>Lemon drizzle cake</h4>
+        <div>Serves 8 · about an hour</div>
+        <h5>Ingredients</h5>
+        <ul><li>225 g soft butter</li><li>225 g caster sugar</li><li>4 eggs</li></ul>
+        <h5>Method</h5>
+        <ol><li>Heat the oven to 180°C</li><li>Beat the butter and sugar…</li></ol>
+        <span class="file">W&nbsp; Lemon drizzle cake.docx</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="styles">
+  <div class="wrap">
+    <div class="center">
+      <div class="kicker">Styles</div>
+      <h2>A layout that suits the note.</h2>
+      <p class="intro">Automatic looks at what's in your note and picks the right style. You can always choose another.</p>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Styles">
+      <button class="tab" role="tab" id="t-recipe" aria-controls="p-recipe" aria-selected="true">Recipes</button>
+      <button class="tab" role="tab" id="t-chapter" aria-controls="p-chapter" aria-selected="false" tabindex="-1">Book chapters</button>
+      <button class="tab" role="tab" id="t-list" aria-controls="p-list" aria-selected="false" tabindex="-1">Checklists and tables</button>
+      <button class="tab" role="tab" id="t-start" aria-controls="p-start" aria-selected="false" tabindex="-1">Getting started</button>
+    </div>
+
+    <div class="panel" role="tabpanel" id="p-recipe" aria-labelledby="t-recipe">
+      <div>
+        <h3>Recipes</h3>
+        <p>Ingredients, Method, Notes and Serves become proper headings, so a recipe reads like it came out of a cookbook.</p>
+        <ul><li>Bulleted ingredients and numbered steps</li><li>A neat rule under the title</li><li>Build a family cookbook from a collection of notes</li></ul>
+      </div>
+      <div class="shot"><img src="images/recipe.png" width="1920" height="1080" loading="lazy" alt="A recipe in the NoteChange preview with Ingredients and Method headings"></div>
+    </div>
+    <div class="panel" role="tabpanel" id="p-chapter" aria-labelledby="t-chapter" hidden>
+      <div>
+        <h3>Book chapters</h3>
+        <p>Writing a story on your phone? Chapter style sets it like a printed book.</p>
+        <ul><li>Serif type, justified text and indented paragraphs</li><li>A centred chapter title</li><li>Every chapter starts on a new page when you export a collection</li></ul>
+      </div>
+      <div class="shot"><img src="images/chapter.png" width="1920" height="1080" loading="lazy" alt="A story laid out as a book chapter with a centred title and indented paragraphs"></div>
+    </div>
+    <div class="panel" role="tabpanel" id="p-list" aria-labelledby="t-list" hidden>
+      <div>
+        <h3>Checklists and tables</h3>
+        <p>Packing lists, plans and to-dos keep their ticks, headings, tables and links.</p>
+        <ul><li>Ticked and unticked items stay as they were</li><li>Tables come across with their header row</li><li>Links still work in Word, PDF and email</li></ul>
+      </div>
+      <div class="shot"><img src="images/checklist.png" width="1920" height="1080" loading="lazy" alt="A packing checklist and a table of walks in the NoteChange preview"></div>
+    </div>
+    <div class="panel" role="tabpanel" id="p-start" aria-labelledby="t-start" hidden>
+      <div>
+        <h3>Getting started</h3>
+        <p>NoteChange shows you what to do the first time you open it, and you can try it with an example before signing in.</p>
+        <ul><li>Try a recipe, a chapter or a checklist</li><li>Paste a note from any app, or open a text file</li><li>Your choices are remembered next time</li></ul>
+      </div>
+      <div class="shot"><img src="images/welcome.png" width="1920" height="1080" loading="lazy" alt="The NoteChange welcome screen with three steps and example buttons"></div>
+    </div>
+  </div>
+</section>
+
+<section id="share">
+  <div class="wrap">
+    <div class="center">
+      <div class="kicker">Saving and sharing</div>
+      <h2>Send it however you like.</h2>
+      <p class="intro">Every format keeps your words exactly as they are, with the formatting each one can hold.</p>
+    </div>
+    <div class="bento">
+      <div class="b-wide">
+        <h3><span class="ext x-word">DOCX</span>Real Word documents</h3>
+        <p>Proper title and heading styles, so Word's navigation pane and table of contents just work. Numbered lists restart where they should, and pictures, tables and links come too.</p>
+        <div class="formats"><span>Word</span><span>Pages</span><span>Google Docs</span><span>LibreOffice</span></div>
+      </div>
+      <div class="b-small">
+        <h3><span class="ext x-pdf">PDF</span>Ready to print</h3>
+        <p>A4 pages with clean margins.</p>
+        <div class="pages" aria-hidden="true"><i></i><i></i><i></i></div>
+      </div>
+      <div class="b-mid">
+        <h3><span class="ext x-eml">EML</span>Straight into email</h3>
+        <p><b>Copy for email</b> pastes with formatting into Outlook, Gmail or Mail. <b>Email draft</b> saves a message with pictures in place, ready for a recipient and a subject.</p>
+      </div>
+      <div class="b-mid">
+        <h3><span class="ext x-md">MD</span>Text and Markdown</h3>
+        <p>For notes apps, wikis and websites. Checklists become task boxes and tables become Markdown tables.</p>
+      </div>
+      <div class="b-small">
+        <h3>Collections</h3>
+        <p>Put notes in order and save them as one document, each on a new page. Save the collection to carry on later.</p>
+      </div>
+      <div class="b-wide">
+        <h3>Quick with a keyboard</h3>
+        <div class="keys">
+          <div>Paste a note<kbd>Ctrl+V</kbd></div>
+          <div>Save as Word<kbd>Ctrl+S</kbd></div>
+          <div>Save as PDF<kbd>Ctrl+P</kbd></div>
+          <div>Reorder notes<kbd>Alt+↑ / ↓</kbd></div>
+          <div>Open a file<kbd>Ctrl+O</kbd></div>
+          <div>Add the open iCloud note<kbd>Ctrl+Enter</kbd></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="privacy">
+  <div class="wrap">
+    <div class="center">
+      <div class="kicker">Privacy</div>
+      <h2>Your notes stay yours.</h2>
+      <p class="intro">NoteChange has no servers and no accounts. It talks to iCloud to show your notes and to GitHub to check for updates. That's it.</p>
+    </div>
+    <div class="why">
+      <div><span class="ic amber"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></span><h3>Everything on your PC</h3><p>Layouts, previews and exports all happen on your computer. Previews are built in memory.</p></div>
+      <div><span class="ic teal"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><h3>Apple handles sign-in</h3><p>You sign in on Apple's own page. NoteChange never sees your password, and Sign out removes everything.</p></div>
+      <div><span class="ic coral"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span><h3>Read-only</h3><p>NoteChange only reads the note you choose, when you press the button. It never changes anything in iCloud.</p></div>
+      <div><span class="ic amber"><svg viewBox="0 0 24 24"><path d="M4 19h4L19 8l-4-4L4 15z"/><path d="m13 6 4 4"/></svg></span><h3>No rewriting</h3><p>No AI and no summaries. It lays your words out; it never changes them.</p></div>
+    </div>
+    <p class="center" style="margin-top:22px;color:var(--muted);font-size:14.5px">Read the full <a href="https://github.com/bhxuk/notechange/blob/main/docs/PRIVACY.md" style="color:var(--amber)">privacy notes</a>.</p>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <div class="kicker">Install</div>
+    <h2>Up and running in a minute.</h2>
+    <div class="install" style="margin-top:36px">
+      <div>
+        <ol class="steps">
+          <li><b>Download NoteChange-Setup.exe</b>It's about 70 MB and includes everything NoteChange needs.</li>
+          <li><b>Double-click it</b>No admin rights needed. It installs just for you and adds NoteChange to the Start menu.</li>
+          <li><b>Open iCloud Notes</b>Sign in, open a note and press Add this note.</li>
+        </ol>
+        <div class="warn"><b>"Windows protected your PC"?</b> The installer isn't code-signed yet, so Windows asks first. Click <b>More info</b>, then <b>Run anyway</b>.</div>
+      </div>
+      <div>
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:28px">
+          <h3 style="font-size:18px;margin-bottom:12px">What you need</h3>
+          <ul style="list-style:none;display:grid;gap:10px;color:var(--muted)">
+            <li><b style="color:var(--text)">Windows 10 or 11</b>, 64-bit.</li>
+            <li><b style="color:var(--text)">An Apple Account</b> with Notes switched on in iCloud. Or skip iCloud and paste notes in.</li>
+            <li><b style="color:var(--text)">Microsoft Edge WebView2</b>, already part of Windows 11 and almost every Windows 10 PC. Setup tells you if it's missing.</li>
+          </ul>
+          <p style="color:var(--muted);margin-top:16px;font-size:15px">Updates install with one click from inside the app. See the <a href="https://github.com/bhxuk/notechange/blob/main/docs/USER-GUIDE.md" style="color:var(--amber)">user guide</a> for the details.</p>
+          <div class="cta" style="justify-content:flex-start;margin-top:22px">
+            <a class="btn primary" href="https://github.com/bhxuk/notechange/releases/latest/download/NoteChange-Setup.exe"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>Download for Windows</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap" style="max-width:820px">
+    <div class="center"><div class="kicker">Questions</div><h2>Good to know.</h2></div>
+    <div style="margin-top:36px">
+      <details><summary>Is NoteChange free?</summary><p>Yes. It's free and open source under the MIT licence.</p></details>
+      <details><summary>Will it change my notes?</summary><p>No. NoteChange only reads the note you choose. Nothing in iCloud is changed, moved or deleted, and the words in your documents are exactly the words in your notes.</p></details>
+      <details><summary>Some of my notes don't show up.</summary><p>Notes kept "On My iPhone" or "On My Mac" aren't stored in iCloud, so they don't appear on iCloud.com. Copy them and use Paste note instead. Locked notes need unlocking in iCloud first.</p></details>
+      <details><summary>What about pictures and attachments?</summary><p>Pictures come across into Word, PDF and email drafts. PDFs, audio, sketches and other attachments stay in Apple Notes, and NoteChange tells you when a note has one.</p></details>
+      <details><summary>I use Advanced Data Protection. Will it work?</summary><p>Yes, once you allow web access to iCloud. iCloud.com asks you to approve it from one of your trusted devices.</p></details>
+      <details><summary>Is there a Mac or iPhone version?</summary><p>Not at the moment. NoteChange is for Windows 10 and 11.</p></details>
+      <details><summary>Is NoteChange made by Apple?</summary><p>No. It's an independent app. It reads notes through Apple's iCloud web page, not an official Apple API, so if Apple changes that page NoteChange may need an update. Paste note always works.</p></details>
+      <details><summary>Something isn't working.</summary><p>Please <a href="https://github.com/bhxuk/notechange/issues">open an issue on GitHub</a> and describe what happened. Don't include your Apple password or anything private.</p></details>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="final">
+    <img src="images/icon.png" alt="">
+    <h2>Make more of your notes.</h2>
+    <p class="intro" style="margin-left:auto;margin-right:auto">Free for Windows 10 and 11.</p>
+    <div class="cta"><a class="btn primary" href="https://github.com/bhxuk/notechange/releases/latest/download/NoteChange-Setup.exe"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>Download NoteChange</a>
+    <a class="btn ghost" href="https://github.com/bhxuk/notechange">View on GitHub</a></div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <div><b style="color:var(--text)">NoteChange</b> by bhxuk</div>
+      <nav aria-label="Footer">
+        <a href="https://github.com/bhxuk/notechange">GitHub</a>
+        <a href="https://github.com/bhxuk/notechange/blob/main/docs/USER-GUIDE.md">User guide</a>
+        <a href="https://github.com/bhxuk/notechange/blob/main/docs/PRIVACY.md">Privacy</a>
+        <a href="https://github.com/bhxuk/notechange/blob/main/CHANGELOG.md">What's new</a>
+        <a href="https://github.com/bhxuk/notechange/releases">All releases</a>
+      </nav>
+    </div>
+    <small>Apple, iCloud and Apple Notes are trademarks of Apple Inc. NoteChange is an independent app and isn't made or endorsed by Apple.</small>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  function select(tab, focus) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    });
+    if (focus) tab.focus();
+  }
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () { select(tab, false); });
+    tab.addEventListener('keydown', function (e) {
+      var next = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : null;
+      if (next === null) return;
+      e.preventDefault();
+      select(tabs[(next + tabs.length) % tabs.length], true);
+    });
+  });
+})();
+</script>
+</body>
+</html>

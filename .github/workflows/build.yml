@@ -120,16 +120,20 @@ jobs:
       - name: Test the installer
         shell: pwsh
         run: |
-          $p = Start-Process -FilePath 'dist\NoteChange-Setup.exe' -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/TASKS=""' -PassThru -Wait
+          # WaitForExit waits for Setup itself; Setup opens NoteChange afterwards, which must not block the build.
+          $p = Start-Process -FilePath 'dist\NoteChange-Setup.exe' -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/TASKS=""' -PassThru
+          if (-not $p.WaitForExit(180000)) { throw 'Setup timed out.' }
           if ($p.ExitCode -ne 0) { throw "Setup failed ($($p.ExitCode))." }
-          Start-Sleep -Seconds 3
+          Start-Sleep -Seconds 5
           Get-Process NoteChange -ErrorAction SilentlyContinue | Stop-Process -Force
           $exe = Join-Path $env:LOCALAPPDATA 'Programs\NoteChange\NoteChange.exe'
           if (-not (Test-Path $exe)) { throw 'NoteChange.exe was not installed.' }
           $installed = (Get-Item $exe).VersionInfo.ProductVersion
           Write-Host "Installed $installed"
+          Write-Host ("::notice title=Installer::Installed NoteChange $installed. Setup is " + [math]::Round((Get-Item 'dist\NoteChange-Setup.exe').Length / 1MB, 1) + " MB.")
           $u = Get-ChildItem "$env:LOCALAPPDATA\Programs\NoteChange" -Filter 'unins*.exe' | Select-Object -First 1
-          $p = Start-Process -FilePath $u.FullName -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART' -PassThru -Wait
+          $p = Start-Process -FilePath $u.FullName -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART' -PassThru
+          $null = $p.WaitForExit(120000)
           for ($i = 0; $i -lt 20 -and (Test-Path $exe); $i++) { Start-Sleep -Seconds 1 }
           if (Test-Path $exe) { throw 'Uninstall left NoteChange.exe behind.' }
           Write-Host 'Install and uninstall both worked.'
