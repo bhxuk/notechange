@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>NoteChange</AssemblyName>
+    <RootNamespace>NoteChange</RootNamespace>
+    <Version>1.0.0</Version>
+    <Product>NoteChange</Product>
+    <Company>bhxuk</Company>
+    <Copyright>Copyright (c) 2026 bhxuk</Copyright>
+    <Description>NoteChange: turn iCloud notes into Word documents, PDFs, recipes and book chapters.</Description>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\notechange.ico</ApplicationIcon>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <StartupObject>NoteChange.Program</StartupObject>
+    <NoWarn>$(NoWarn);CA1416;CS8632</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NoteChange.Core\NoteChange.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\notechange.ico" />
+    <Resource Include="Assets\notechange-256.png" />
+    <EmbeddedResource Include="Capture.js" LogicalName="NoteChange.Capture.js" />
+  </ItemGroup>
+
+</Project>

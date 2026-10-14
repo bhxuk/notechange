@@ -1,1 +1,0 @@
-const {execFileSync}=require('node:child_process');const {readdirSync}=require('node:fs');for(const dir of ['src','scripts','tests'])for(const f of readdirSync(dir))if(/\.(cjs|js)$/.test(f))execFileSync(process.execPath,['--check',`${dir}/${f}`]);console.log('JavaScript syntax checks passed.');
