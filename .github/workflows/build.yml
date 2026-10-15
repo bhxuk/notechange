@@ -74,36 +74,6 @@ jobs:
           Write-Host ("::notice title=Self-test::" + (($report -join '%0A') -replace '\r', ''))
           if ($p.ExitCode -ne 0) { throw "The self-test failed ($($p.ExitCode))." }
 
-      - name: Share the self-test output for review
-        if: always() && github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')
-        continue-on-error: true
-        shell: pwsh
-        run: |
-          $out = Join-Path $env:RUNNER_TEMP 'self-test'
-          if (-not (Test-Path $out)) { exit 0 }
-          # Pictures of the website too, at desktop and phone widths.
-          $edge = "${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe"
-          if (-not (Test-Path $edge)) { $edge = "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe" }
-          $site = 'file:///' + ((Resolve-Path docs\index.html).Path -replace '\\', '/')
-          foreach ($size in @('1440,6400', '390,9000')) {
-            $name = if ($size.StartsWith('1440')) { 'site-desktop.png' } else { 'site-phone.png' }
-            $p = Start-Process -FilePath $edge -ArgumentList '--headless=new', '--disable-gpu', '--hide-scrollbars', "--window-size=$size", '--virtual-time-budget=8000', "--screenshot=$out\$name", $site -PassThru
-            $null = $p.WaitForExit(60000)
-          }
-          $dir = Join-Path $env:RUNNER_TEMP 'review'
-          $remote = "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
-          git init -q $dir
-          Copy-Item "$out\*" $dir -Recurse
-          Set-Location $dir
-          git config user.name "github-actions"
-          git config user.email "github-actions@users.noreply.github.com"
-          git checkout -q -b review-output
-          git add -A
-          git commit -qm "Self-test output ${{ github.run_number }}"
-          $msg = git push -f $remote "HEAD:refs/heads/review/self-test-${{ github.run_number }}" 2>&1
-          Write-Host ("::notice title=Review push::" + (($msg | Out-String) -replace "`r?`n", '%0A'))
-          exit 0
-
       - name: Keep the self-test results
         if: always()
         uses: actions/upload-artifact@v4

@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,6 +21,8 @@ namespace NoteChange
         private readonly Button _add;
         private readonly Action<NoteSource> _onNote;
         private readonly List<CoreWebView2Frame> _frames = new List<CoreWebView2Frame>();
+        private readonly Button _copyDetails;
+        private string _details;
         private bool _busy;
 
         public ICloudWindow(Window owner, Action<NoteSource> onNote)
@@ -53,6 +52,13 @@ namespace NoteChange
             var reload = new Button { Content = "Reload", Style = (Style)Application.Current.Resources["Secondary"], Margin = new Thickness(8, 0, 0, 0) };
             reload.Click += (s, e) => { try { _web.CoreWebView2?.Reload(); } catch { } };
             var back = new Button { Content = "Back to NoteChange", Style = (Style)Application.Current.Resources["Quiet"] };
+            _copyDetails = new Button { Content = "Copy details", Style = (Style)Application.Current.Resources["Quiet"], Visibility = Visibility.Collapsed, Foreground = Theme.Amber };
+            _copyDetails.ToolTip = "Copies a description of how this page is built (never your note's text), to help fix the problem";
+            _copyDetails.Click += (s, e) =>
+            {
+                try { Clipboard.SetText(_details ?? ""); Status("Details copied. Paste them into an issue on GitHub, or send them to whoever helps you with NoteChange."); }
+                catch { Status("Couldn't copy the details. Try again."); }
+            };
             back.Click += (s, e) => { Application.Current.MainWindow?.Activate(); };
 
             _status = new TextBlock
@@ -61,7 +67,7 @@ namespace NoteChange
                 Foreground = Theme.Muted,
                 FontSize = 13,
                 VerticalAlignment = VerticalAlignment.Center,
-                TextTrimming = TextTrimming.CharacterEllipsis,
+                TextWrapping = TextWrapping.Wrap,
                 Margin = new Thickness(16, 0, 12, 0)
             };
 
@@ -70,9 +76,12 @@ namespace NoteChange
             left.Children.Add(_add);
             left.Children.Add(reload);
             DockPanel.SetDock(left, Dock.Left);
-            DockPanel.SetDock(back, Dock.Right);
+            var right = new StackPanel { Orientation = Orientation.Horizontal };
+            right.Children.Add(_copyDetails);
+            right.Children.Add(back);
+            DockPanel.SetDock(right, Dock.Right);
             bar.Children.Add(left);
-            bar.Children.Add(back);
+            bar.Children.Add(right);
             bar.Children.Add(_status);
 
             var top = new Border
@@ -173,112 +182,36 @@ namespace NoteChange
             if (_busy || _web.CoreWebView2 == null) return;
             _busy = true;
             _add.IsEnabled = false;
+            _copyDetails.Visibility = Visibility.Collapsed;
             Status("Reading the note…");
             try
             {
-                var (source, error) = await CaptureRunner.Run(_web.CoreWebView2, _frames.ToList());
-                if (source == null) { Status(error); return; }
-                var imported = Importer.Import(source);
-                _onNote(source);
+                var result = await CaptureRunner.Run(_web.CoreWebView2, _frames.ToList());
+                _details = result.Details;
+                Log.Write(result.Details);
+                if (result.Source == null)
+                {
+                    Status(result.Error);
+                    _copyDetails.Visibility = Visibility.Visible;
+                    return;
+                }
+                var imported = Importer.Import(result.Source);
+                _onNote(result.Source);
                 Status("Added \u201C" + (imported.Title.Length > 0 ? imported.Title : "Untitled note") + "\u201D. Open another note to add more.");
             }
             catch (NoteException ex) { Status(ex.Message); }
             catch (Exception ex)
             {
                 Log.Write("Capture failed: " + ex);
-                Status("NoteChange couldn't read that note. Copy it and use Paste note instead.");
+                _details = "Capture failed: " + ex.GetType().Name + ": " + ex.Message;
+                _copyDetails.Visibility = Visibility.Visible;
+                Status(CaptureRunner.NotFound);
             }
             finally
             {
                 _busy = false;
                 _add.IsEnabled = true;
             }
-        }
-    }
-
-    /// <summary>Runs Capture.js in the page and its frames and keeps the one clear result.</summary>
-    public static class CaptureRunner
-    {
-        private static string _script;
-
-        private static string Script
-        {
-            get
-            {
-                if (_script != null) return _script;
-                using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("NoteChange.Capture.js");
-                using var reader = new StreamReader(stream);
-                return _script = reader.ReadToEnd();
-            }
-        }
-
-        private sealed class CaptureResult
-        {
-            public string html { get; set; }
-            public string text { get; set; }
-            public List<string> warnings { get; set; }
-            public string error { get; set; }
-        }
-
-        public static async Task<(NoteSource Source, string Error)> Run(CoreWebView2 core, IList<CoreWebView2Frame> frames)
-        {
-            string token = Guid.NewGuid().ToString("N");
-            string script = Script.Replace("__TOKEN__", JsonSerializer.Serialize(token));
-            string poll = "(function(){var n=window.__notechange;return (n&&n.token===" + JsonSerializer.Serialize(token) +
-                          "&&n.done)?JSON.stringify(n.result):null;})()";
-
-            var runners = new List<Func<string, Task<string>>> { s => core.ExecuteScriptAsync(s) };
-            foreach (var f in frames) runners.Add(s => f.ExecuteScriptAsync(s));
-
-            var started = new List<Func<string, Task<string>>>();
-            foreach (var run in runners)
-            {
-                try
-                {
-                    string r = await run(script);
-                    if (r == "\"started\"") started.Add(run);
-                }
-                catch (Exception ex) { Log.Write("Frame skipped: " + ex.Message); }
-            }
-            if (started.Count == 0) return (null, "Open iCloud Notes and choose a note first.");
-
-            var results = new List<CaptureResult>();
-            var deadline = DateTime.UtcNow.AddSeconds(25);
-            var pending = new List<Func<string, Task<string>>>(started);
-            while (pending.Count > 0 && DateTime.UtcNow < deadline)
-            {
-                await Task.Delay(150);
-                foreach (var run in pending.ToList())
-                {
-                    try
-                    {
-                        string raw = await run(poll);
-                        if (raw == "null" || string.IsNullOrEmpty(raw)) continue;
-                        string json = JsonSerializer.Deserialize<string>(raw);
-                        results.Add(JsonSerializer.Deserialize<CaptureResult>(json));
-                        pending.Remove(run);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write("Poll failed: " + ex.Message);
-                        pending.Remove(run);
-                    }
-                }
-            }
-
-            var good = results.Where(r => r != null && r.error == null && (!string.IsNullOrWhiteSpace(r.text) || !string.IsNullOrWhiteSpace(r.html))).ToList();
-            if (good.Count != 1)
-            {
-                string why = good.Count > 1
-                    ? "More than one note is open. Close the others and try again."
-                    : results.Select(r => r?.error).FirstOrDefault(e => e != null)
-                      ?? (pending.Count > 0 ? "Reading the note took too long. Try again." : "NoteChange couldn't read that note. Copy it and use Paste note instead.");
-                return (null, why);
-            }
-
-            var source = NoteSource.FromHtml(good[0].html ?? "", good[0].text ?? "", "icloud");
-            if (good[0].warnings != null) source.Warnings.AddRange(good[0].warnings.Distinct());
-            return (source, null);
         }
     }
 }

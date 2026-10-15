@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -143,42 +144,29 @@ namespace NoteChange
         /// <summary>Runs the note reader against a stand-in iCloud page with the editor inside a frame.</summary>
         private static async Task CaptureCheck(Window owner)
         {
-            var env = await Browser.PreviewEnvironment();
-            var controller = await env.CreateCoreWebView2ControllerAsync(new WindowInteropHelper(owner).EnsureHandle());
-            try
+            string editorBody =
+                "<div><b>Garden jobs</b></div>" +
+                "<div>Prune the <span style='font-weight:700'>roses</span> and <span style='font-style:italic'>water</span> the pots.</div>" +
+                "<ul><li><span role='checkbox' aria-checked='true'></span>Mow the lawn</li><li><span role='checkbox' aria-checked='false'></span>Weed the beds</li></ul>" +
+                "<div><img src='data:image/png;base64," + Png1x1 + "' alt='dot' style='width:40px;height:40px'></div>" +
+                "<div><img src='data:image/gif;base64," + Gif1x1 + "' alt='gif' style='width:40px;height:40px'></div>";
+
+            // Hard case: the editor is in a closed shadow root, inside a srcdoc frame, inside the Notes app frame.
+            string inner = "<!doctype html><html><body style='margin:0;font-family:sans-serif'><div id='host' style='width:780px;min-height:420px'></div><script>" +
+                "var r=document.getElementById('host').attachShadow({mode:'closed'});" +
+                "r.innerHTML=" + JsonSerializer.Serialize("<div contenteditable='true' style='width:760px;min-height:400px'>" + editorBody + "</div>") + ";" +
+                "</script></body></html>";
+            string notesApp = "<!doctype html><html><body style='margin:0;display:flex'>" +
+                "<nav style='width:200px'><input type='search' placeholder='Search all notes'><div>Shopping</div><div>Garden jobs</div></nav>" +
+                "<div id='slot' style='flex:1'></div><script>var f=document.createElement('iframe');f.style.cssText='width:800px;height:600px;border:0';" +
+                "f.srcdoc=" + JsonSerializer.Serialize(inner) + ";document.getElementById('slot').appendChild(f);</script></body></html>";
+            string top = "<!doctype html><html><body style='margin:0'><iframe src='https://www.icloud.com/applications/notes3/index.html' style='width:1040px;height:660px;border:0'></iframe></body></html>";
+
+            var (source, error, details) = await CaptureFrom(owner, top, notesApp, null);
+            Report.AppendLine(Indent(details));
+            Check("Reads a note hidden deep in iCloud frames", source != null, error ?? "");
+            if (source != null)
             {
-                controller.Bounds = new System.Drawing.Rectangle(0, 0, 900, 700);
-                controller.IsVisible = true;
-                var core = controller.CoreWebView2;
-                var frames = new List<CoreWebView2Frame>();
-                core.FrameCreated += (s, e) => frames.Add(e.Frame);
-
-                string top = "<!doctype html><html><body style='margin:0'><iframe src='https://www.icloud.com/applications/notes3/index.html' style='width:860px;height:640px;border:0'></iframe></body></html>";
-                string editor = "<!doctype html><html><body style='margin:0;font-family:sans-serif'>" +
-                    "<div contenteditable='true' style='width:800px;min-height:400px'>" +
-                    "<div><b>Garden jobs</b></div>" +
-                    "<div>Prune the <span style='font-weight:700'>roses</span> and <span style='font-style:italic'>water</span> the pots.</div>" +
-                    "<ul><li><span role='checkbox' aria-checked='true'></span>Mow the lawn</li><li><span role='checkbox' aria-checked='false'></span>Weed the beds</li></ul>" +
-                    "<div><img src='data:image/png;base64," + Png1x1 + "' alt='dot' style='width:40px;height:40px'></div>" +
-                    "<div><img src='data:image/gif;base64," + Gif1x1 + "' alt='gif' style='width:40px;height:40px'></div>" +
-                    "</div></body></html>";
-
-                var env2 = env;
-                core.AddWebResourceRequestedFilter("https://www.icloud.com/*", CoreWebView2WebResourceContext.All);
-                core.WebResourceRequested += (s, e) =>
-                {
-                    string page = e.Request.Uri.Contains("/applications/") ? editor : top;
-                    e.Response = env2.CreateWebResourceResponse(new MemoryStream(Encoding.UTF8.GetBytes(page)), 200, "OK", "Content-Type: text/html; charset=utf-8");
-                };
-                var loaded = new TaskCompletionSource<bool>();
-                core.NavigationCompleted += (s, e) => loaded.TrySetResult(e.IsSuccess);
-                core.Navigate("https://www.icloud.com/notes/");
-                await Wait(loaded.Task);
-                await Task.Delay(1500);
-
-                var (source, error) = await CaptureRunner.Run(core, frames);
-                Check("Reads a note inside an iCloud frame", source != null, error ?? frames.Count + " frame(s)");
-                if (source == null) return;
                 var doc = Formatter.Format(Importer.Import(source), new FormatOptions());
                 Check("Note title", doc.Title == "Garden jobs", doc.Title);
                 var runs = doc.Blocks.SelectMany(b => b.Runs).ToList();
@@ -188,6 +176,51 @@ namespace NoteChange
                     string.Join(" / ", items.Select(i => i.PlainText)));
                 var images = runs.Where(r => r.IsImage).ToList();
                 Check("Pictures come across (PNG kept, GIF converted)", images.Count == 2 && images.All(i => i.Image.Format == "png"), images.Count + " picture(s)");
+            }
+
+            // Simple case: the editor directly in the Notes app frame.
+            string plainApp = "<!doctype html><html><body style='margin:0'><div contenteditable='true' style='width:800px;min-height:400px'>" + editorBody + "</div></body></html>";
+            var simple = await CaptureFrom(owner, top, plainApp, null);
+            Check("Reads a note in a simple iCloud frame", simple.Source != null, simple.Error ?? "");
+
+            // Fallback: no editor on the page, but the person has selected the note.
+            string readOnly = "<!doctype html><html><body style='margin:0'><div id='note' style='width:800px'><h1>House</h1><table><tr><td>Carpet</td><td>£517</td></tr></table></div></body></html>";
+            var selected = await CaptureFrom(owner, top, readOnly, "var d=document.querySelector('iframe').contentDocument;var r=d.createRange();r.selectNodeContents(d.getElementById('note'));d.getSelection().removeAllRanges();d.getSelection().addRange(r);");
+            Check("Reads a selected note when there's no editor", selected.Source != null && selected.Source.Text.Contains("Carpet"), selected.Error ?? "");
+            if (selected.Source == null) Report.AppendLine(Indent(selected.Details));
+
+            // Nothing open and nothing selected: a clear message, not a crash.
+            var none = await CaptureFrom(owner, top, "<!doctype html><html><body><p>Choose a note</p></body></html>", null);
+            Check("Explains when no note is open", none.Source == null && none.Error == CaptureRunner.NotFound, none.Error ?? "");
+        }
+
+        private static string Indent(string text) => "      " + (text ?? "").TrimEnd().Replace("\n", "\n      ");
+
+        private static async Task<(NoteSource Source, string Error, string Details)> CaptureFrom(Window owner, string top, string app, string setup)
+        {
+            var env = await Browser.PreviewEnvironment();
+            var controller = await env.CreateCoreWebView2ControllerAsync(new WindowInteropHelper(owner).EnsureHandle());
+            try
+            {
+                controller.Bounds = new System.Drawing.Rectangle(0, 0, 1100, 700);
+                controller.IsVisible = true;
+                var core = controller.CoreWebView2;
+                var frames = new List<CoreWebView2Frame>();
+                core.FrameCreated += (s, e) => frames.Add(e.Frame);
+                core.AddWebResourceRequestedFilter("https://www.icloud.com/*", CoreWebView2WebResourceContext.All);
+                core.WebResourceRequested += (s, e) =>
+                {
+                    string page = e.Request.Uri.Contains("/applications/") ? app : top;
+                    e.Response = env.CreateWebResourceResponse(new MemoryStream(Encoding.UTF8.GetBytes(page)), 200, "OK", "Content-Type: text/html; charset=utf-8");
+                };
+                var loaded = new TaskCompletionSource<bool>();
+                core.NavigationCompleted += (s, e) => loaded.TrySetResult(e.IsSuccess);
+                core.Navigate("https://www.icloud.com/notes/");
+                await Wait(loaded.Task);
+                await Task.Delay(1500);
+                if (setup != null) await core.ExecuteScriptAsync(setup);
+                var result = await CaptureRunner.Run(core, frames);
+                return (result.Source, result.Error, result.Details);
             }
             finally
             {

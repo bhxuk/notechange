@@ -1,5 +1,11 @@
 # What's new
 
+## 1.0.1
+
+- **Fixed: Add this note did nothing on some iCloud accounts.** NoteChange now looks through the whole iCloud page, including the parts tucked inside frames and hidden sections, to find the open note.
+- **New fallback.** If the note still can't be found, click inside it, press Ctrl+A to select it, and press Add this note. NoteChange reads what you selected.
+- **Copy details.** When a note can't be read, a Copy details button describes how the page is built (never your note's text) so the problem can be fixed quickly.
+
 ## 1.0.0
 
 NoteChange has been rebuilt from the ground up as a native Windows app.

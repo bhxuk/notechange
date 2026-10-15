@@ -97,9 +97,9 @@ Use **Settings > Apps > Installed apps > NoteChange > Uninstall**. This also rem
 
 ## Troubleshooting
 
-**"Open a note in iCloud first."** Click the note in the list so it's open in the editor, then press **Add this note** again.
+**"NoteChange couldn't find the note on this page."** Click inside the note, press **Ctrl+A** to select all of it, then press **Add this note** again. NoteChange reads what you've selected.
 
-**"NoteChange couldn't tell which note is open."** Click inside the note's text and try again. If it keeps happening, select all the text in the note, copy it and use **Paste note**.
+**It still doesn't work.** Press **Copy details** in the iCloud window and paste the result into a [GitHub issue](https://github.com/bhxuk/notechange/issues). The details describe how the iCloud page is built and never include your note's text.
 
 **iCloud doesn't load.** Check your internet connection and press **Reload** in the iCloud window.
 
